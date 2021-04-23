@@ -47,19 +47,19 @@ useEffect(() => {
 The project currently shows how to capture a custom iglu schema, the event type being tracked can be updated within the *trackEvent* method as well as items that are captured.
 
 ```js
-    const trackEvent = (e) => {
-        trackSelfDescribingEvent({
-            event : {
-                schema: 'iglu:com.test/task_click/jsonschema/1-0-0',
-                data: {
-                    classList: getClassList(e.target),
-                    eventType: e.type,
-                    objectId: e.target.id,
-                    tagType: e.target.localName,
-                    timestampField: new Date().toISOString()
-                }
+const trackEvent = (e) => {
+    trackSelfDescribingEvent({
+        event : {
+            schema: 'iglu:com.test/task_click/jsonschema/1-0-0',
+            data: {
+                classList: getClassList(e.target),
+                eventType: e.type,
+                objectId: e.target.id,
+                tagType: e.target.localName,
+                timestampField: new Date().toISOString()
             }
-        })
-    }
+        }
+    })
+}
 ```
 
