@@ -1,87 +1,65 @@
+# Storybook with Snowplow Tracker Sample
 
-<p align="center">
-  <a href="https://www.chromatic.com/">
-    <img alt="Chromatic" src="https://avatars2.githubusercontent.com/u/24584319?s=200&v=4" width="60" />
-  </a>
-</p>
+This is a sample ToDo project demonstrating the usage of [Storybook.js](https://storybook.js.org/docs/react/get-started/introduction) and [Snowplow Browser Tracker](https://docs.snowplowanalytics.com/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/)
 
-<h1 align="center">
-  Chromatic's Intro to Storybook React template
-</h1>
+## Starting the Project
 
-This template ships with the main React and Storybook configuration files you'll need to get up and running fast.
+Install all dependancies and start the project, site will be running at http://localhost:3000/
 
-## 🚅  Quick start
+```bash
+npm install
+npm start
+```
 
-1.  **Create the application.**
+## Running Storybook
 
-    Use [degit](https://github.com/Rich-Harris/degit) to get this template.
+Run the Storybook.js documentation interface by running:
 
-    ```shell
-    # Clone the template
-    npx degit chromaui/intro-storybook-react-template taskbox
-    ```
+```bash
+npm run storybook
+```
 
-1.  **Install the dependencies.**
+## Snowplow Setup
 
-    Navigate into your new site’s directory and install the necessary dependencies.
+The snowplow browser tracker is setup inside the [App.js](src/App.js) file.  
 
-    ```shell
-    # Navigate to the directory
-    cd taskbox/
+### Update Collector
+Currently the collector is pointing to an endpoint running at http://localhost:8080, this can be updated within the *newTracker* method.
 
-    # Install the dependencies
-    yarn
-    ```
+```js
+newTracker('sp1', 'http://localhost:8080', {appId:'my-app-id', plugins: []});
+```
 
-1.  **Open the source code and start editing!**
+## Snowplow Interceptor
 
-    Open the `taskbox` directory in your code editor of choice and building your first component!
+This project includes an event interceptor that can be configured at [snowplow-interceptor.js](src/utils/snowplow-interceptor.js), it is instantiated inside [App.js](src/App.js) file.  The interceptor attaches a click event listener to the body of the DOM and will capture all click events (except those that are not propagating).
 
-1.  **Browse your stories!**
+### Usage
+When instantiated it will, by default, attach an event listener to the body, but if a specific html id is passed as a parameter it will attach an event listener to that specific element.  An example of this is within the [Task.js](src/components/Task/Task.js) file.
 
-    Run `yarn storybook` to see your component's stories at `http://localhost:6006`
+```js
+useEffect(() => {
+  SnowPlowInterceptor("pin-" + id);
+}, [id]);
+```
 
-## 🔎 What's inside?
+### Update Event Type
+The project currently shows how to capture a custom iglu schema, the event type being tracked can be updated within the *trackEvent* method as well as items that are captured.
 
-A quick look at the top-level files and directories included with this template.
+```js
+    const trackEvent = (e) => {
+        trackSelfDescribingEvent({
+            event : {
+                schema: 'iglu:com.test/task_click/jsonschema/1-0-0',
+                data: {
+                    classList: getClassList(e.target),
+                    eventType: e.type,
+                    objectId: e.target.id,
+                    tagType: e.target.localName,
+                    timestampField: new Date().toISOString()
+                }
+            }
+        })
+    }
+```
 
-    .
-    ├── .storybook
-    ├── node_modules
-    ├── public
-    ├── src
-    ├── .gitignore
-    ├── LICENSE
-    ├── package.json
-    ├── yarn.lock
-    └── README.md
-
-
-1.  **`.storybook`**: This directory contains Storybook's [configuration](https://storybook.js.org/docs/react/configure/overview) files.
-
-2.  **`node_modules`**: This directory contains all of the modules of code that your project depends on (npm packages).
-
-3.  **`public`**: This directory will contain the development and production build of the site.
-
-4.  **`src`**: This directory will contain all of the code related to what you will see on your application.
-
-5.  **`.gitignore`**: This file tells git which files it should not track or maintain during the development process of your project.
-
-6. **`LICENSE`**: The template is licensed under the MIT licence.
-
-7. **`package.json`**: Standard manifest file for Node.js projects, which typically includes project specific metadata (such as the project's name, the author among other information). It's based on this file that npm will know which packages are necessary to the project.
-
-8. **`yarn.lock`**: This is an automatically generated file based on the exact versions of your npm dependencies that were installed for your project. **(Do not change it manually).**
-
-9. **`README.md`**: A text file containing useful reference information about the project.
-
-## Contribute
-
-If you encounter an issue with the template, we encourage you to open an issue in this template's repository.
-
-## Learning Storybook
-
-1. Read our introductory tutorial at [Learn Storybook](https://www.learnstorybook.com/intro-to-storybook/react/en/get-started/).
-2. Learn how to transform your component libraries into design systems in our [Design Systems for Developers](https://www.learnstorybook.com/design-systems-for-developers/) tutorial.
-2. See our official documentation at [Storybook](https://storybook.js.org/).
